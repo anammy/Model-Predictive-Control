@@ -1,7 +1,42 @@
-# CarND-Controls-MPC
+# Model Predictive Control (MPC)
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+
+## Objective
+
+The purpose of this project was to build a MPC controller to successfully drive the car around the track. 
+
+
+[//]: # (Image References)
+
+[image1]: ./pictures/kinematic-eqns.png "KinematicEqns"
+[image2]: ./pictures/cte.png "CrossTrackError"
+[image3]: ./pictures/epsi.png "OrientationError"
+[image4]: ./pictures/cost.png "Cost"
+
+## Controller Design
+
+Model predictive control requires the prediction of trajectories based on sets of steering and throttle actuations over a specified time horizon. This was accomplished through the following kinematic model:
+
+![alt text][image1]
+
+For each predicted trajectory, the associated cost was calculated using the following equations:
+
+![alt text][image4]
+
+The cost consists of the summation of the squared cross-track error (cte), orientation error (epsi), difference in the velocity and the reference velocity, steering angle, difference in steering angle between time steps, acceleration, difference in acceleration between time steps, and the product of the velocity and the steering angle. The different cost components were multiplied by various weights that were tuned manually inorder to successfully drive the car around the track and provide a smooth ride. The cost was minimized with respect to actuations such as steering angle and throttle. The steering angle was limited to be between -25 deg to 25 deg and the throttle was limited to be between -1 (full brake) to 1 (full acceleration). The predicted trajectory that minimized the cost was chosen as the correct path to follow and only the first set of actuations were performed. This procedure was then repeated for the next time step. The predicted trajectories were calculated for a time horizon of 1 sec with a timestep length N = 10 and the elapsed duration between timesteps dt = 0.1. The predicted trajectories for shorter time horizons (i.e. 0.7 sec, 0.6 sec, and 0.5 sec) weren't able to compensate for sharp turns very well. The predicted trajectories for longer time horizons (i.e. 1.5 sec) were unable to properly track the reference trajectory at the furthest points. As a result, it was wasted computation with no gain in useful information.
+
+The cross track and orientation errors were calculated by fitting the waypoints from the reference trajectory with a 3rd degree polynomial and taking the difference between the predicted trajectory from the kinematic equations and this fitted polynomial. The waypoints provided from the simulator were in map/global coordinates and thus, were transformed into vehicle coordinates through a coordinate system rotation prior to fitting them with a polynomial. The cross track and orientation errors were calculated using the following equations:
+
+![alt text][image2]
+![alt text][image3]
+
+There was an actuation latency of 100 ms that was modelled into the controller. The vehicle state after 100 ms was calculated from the current state given by the simulator through the use of the kinematic equations. The predicted vehicle state after the 100 ms delay was then sent to the MPC solver to calculate the next set of actuations to be executed.
+
+## Code
+
+The default Udacity code directory structure and starter code were used. The files `main.cpp`, `MPC.h`, and `MPC.cpp` were editted to implement the MPC controller and for cost factor tuning.
 
 ## Dependencies
 
@@ -38,71 +73,6 @@ Self-Driving Car Engineer Nanodegree Program
 3. Compile: `cmake .. && make`
 4. Run it: `./mpc`.
 
-## Tips
+## Result
 
-1. It's recommended to test the MPC on basic examples to see if your implementation behaves as desired. One possible example
-is the vehicle starting offset of a straight line (reference). If the MPC implementation is correct, after some number of timesteps
-(not too many) it should find and track the reference line.
-2. The `lake_track_waypoints.csv` file has the waypoints of the lake track. You could use this to fit polynomials and points and see of how well your model tracks curve. NOTE: This file might be not completely in sync with the simulator so your solution should NOT depend on it.
-3. For visualization this C++ [matplotlib wrapper](https://github.com/lava/matplotlib-cpp) could be helpful.)
-4.  Tips for setting up your environment are available [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
-5. **VM Latency:** Some students have reported differences in behavior using VM's ostensibly a result of latency.  Please let us know if issues arise as a result of a VM environment.
-
-## Editor Settings
-
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
-
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
-
-## Code Style
-
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
-
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
-
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/b1ff3be0-c904-438e-aad3-2b5379f0e0c3/concepts/1a2255a0-e23c-44cf-8d41-39b8a3c8264a)
-for instructions and the project rubric.
-
-## Hints!
-
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
-
-## Call for IDE Profiles Pull Requests
-
-Help your fellow students!
-
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
-
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+A video of the car successfully driving around the track is provided [here]().
