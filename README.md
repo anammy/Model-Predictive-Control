@@ -10,10 +10,10 @@ The purpose of this project was to build a MPC controller to successfully drive 
 
 [//]: # (Image References)
 
-[image1]: ./pictures/kinematic-eqns.png "KinematicEqns"
+[image1]: ./pictures/kinematic-eqns "KinematicEqns"
 [image2]: ./pictures/cte.png "CrossTrackError"
 [image3]: ./pictures/epsi.png "OrientationError"
-[image4]: ./pictures/cost.png "Cost"
+[image4]: ./pictures/cost "Cost"
 
 ## Controller Design
 
@@ -30,6 +30,7 @@ The cost consists of the summation of the squared cross-track error (cte), orien
 The cross track and orientation errors were calculated by fitting the waypoints from the reference trajectory with a 3rd degree polynomial and taking the difference between the predicted trajectory from the kinematic equations and this fitted polynomial. The waypoints provided from the simulator were in map/global coordinates and thus, were transformed into vehicle coordinates through a coordinate system rotation prior to fitting them with a polynomial. The cross track and orientation errors were calculated using the following equations:
 
 ![alt text][image2]
+
 ![alt text][image3]
 
 There was an actuation latency of 100 ms that was modelled into the controller. The vehicle state after 100 ms was calculated from the current state given by the simulator through the use of the kinematic equations. The predicted vehicle state after the 100 ms delay was then sent to the MPC solver to calculate the next set of actuations to be executed.
@@ -75,4 +76,4 @@ The default Udacity code directory structure and starter code were used. The fil
 
 ## Result
 
-A video of the car successfully driving around the track is provided [here]().
+A video of the car successfully driving around the track is provided [here](https://github.com/anammy/Model-Predictive-Control/tree/master/video).
