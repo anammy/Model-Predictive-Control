@@ -75,4 +75,4 @@ The default Udacity code directory structure and starter code were used. The fil
 
 ## Result
 
-A video of the car successfully driving around the track is provided [here]().
+A video of the car successfully driving around the track is provided [here](https://github.com/anammy/Model-Predictive-Control/tree/master/video).
